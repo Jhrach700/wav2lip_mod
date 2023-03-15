@@ -118,7 +118,7 @@ def face_detect(images):
     del detector
     return results 
 
-def datagen(frames, mels):
+def datagen(frames, mels=None):
     print("Datagen function!")
     img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
     print("args:",args)
@@ -141,40 +141,40 @@ def datagen(frames, mels):
         y1, y2, x1, x2 = args.box
         face_det_results = [[f[y1: y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
 
-    for i, m in enumerate(mels):
-        idx = 0 if args.static else i%len(frames)
-        frame_to_save = frames[idx].copy()
-        face, coords = face_det_results[idx].copy()
+    # for i, m in enumerate(mels):
+    #     idx = 0 if args.static else i%len(frames)
+    #     frame_to_save = frames[idx].copy()
+    #     face, coords = face_det_results[idx].copy()
 
-        face = cv2.resize(face, (args.img_size, args.img_size))
+    #     face = cv2.resize(face, (args.img_size, args.img_size))
             
-        img_batch.append(face)
-        mel_batch.append(m)
-        frame_batch.append(frame_to_save)
-        coords_batch.append(coords)
+    #     img_batch.append(face)
+    #     mel_batch.append(m)
+    #     frame_batch.append(frame_to_save)
+    #     coords_batch.append(coords)
 
-        if len(img_batch) >= args.wav2lip_batch_size:
-            img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
+    #     if len(img_batch) >= args.wav2lip_batch_size:
+    #         img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
 
-            img_masked = img_batch.copy()
-            img_masked[:, args.img_size//2:] = 0
+    #         img_masked = img_batch.copy()
+    #         img_masked[:, args.img_size//2:] = 0
 
-            img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.
-            mel_batch = np.reshape(mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1])
+    #         img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.
+    #         mel_batch = np.reshape(mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1])
 
-            yield img_batch, mel_batch, frame_batch, coords_batch
-            img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
+    #         yield img_batch, mel_batch, frame_batch, coords_batch
+    #         img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
 
-    if len(img_batch) > 0:
-        img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
+    # if len(img_batch) > 0:
+    #     img_batch, mel_batch = np.asarray(img_batch), np.asarray(mel_batch)
 
-        img_masked = img_batch.copy()
-        img_masked[:, args.img_size//2:] = 0
+    #     img_masked = img_batch.copy()
+    #     img_masked[:, args.img_size//2:] = 0
 
-        img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.
-        mel_batch = np.reshape(mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1])
+    #     img_batch = np.concatenate((img_masked, img_batch), axis=3) / 255.
+    #     mel_batch = np.reshape(mel_batch, [len(mel_batch), mel_batch.shape[1], mel_batch.shape[2], 1])
 
-        yield img_batch, mel_batch, frame_batch, coords_batch
+    #     yield img_batch, mel_batch, frame_batch, coords_batch
 
 mel_step_size = 16
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -207,12 +207,10 @@ def main():
         raise ValueError('--face argument must be a valid path to video/image file')
 
     elif args.face.split('.')[1] in ['jpg', 'png', 'jpeg']:
-        print("in elif!")
         full_frames = [cv2.imread(args.face)]
         fps = args.fps
 
     else:
-        print("in else statement")
         video_stream = cv2.VideoCapture(args.face)
         fps = video_stream.get(cv2.CAP_PROP_FPS)
 
@@ -268,42 +266,40 @@ def main():
     print("Length of mel chunks: {}".format(len(mel_chunks)))
     full_frames = full_frames[:len(mel_chunks)]
 
-    batch_size = args.wav2lip_batch_size    
-    print("type of full frames:",type(full_frames))
-    print("type of mel_chunks:",type(mel_chunks))
+    #batch_size = args.wav2lip_batch_size    
     print("before datagen time:",str(time.time()-st))
-    gen = datagen(full_frames.copy(), mel_chunks)
+    datagen(full_frames.copy())
 
-    for i, (img_batch, mel_batch, frames, coords) in enumerate(tqdm(gen, 
-                                            total=int(np.ceil(float(len(mel_chunks))/batch_size)))):
-        if i == 0:
-            model = load_model(args.checkpoint_path)
-            print ("Model loaded")
+    # for i, (img_batch, mel_batch, frames, coords) in enumerate(tqdm(gen, 
+    #                                         total=int(np.ceil(float(len(mel_chunks))/batch_size)))):
+    #     if i == 0:
+    #         model = load_model(args.checkpoint_path)
+    #         print ("Model loaded")
 
-            frame_h, frame_w = full_frames[0].shape[:-1]
-            out = cv2.VideoWriter('temp/result.avi', 
-                                    cv2.VideoWriter_fourcc(*'DIVX'), fps, (frame_w, frame_h))
+    #         frame_h, frame_w = full_frames[0].shape[:-1]
+    #         out = cv2.VideoWriter('temp/result.avi', 
+    #                                 cv2.VideoWriter_fourcc(*'DIVX'), fps, (frame_w, frame_h))
 
-        img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
-        mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
+    #     img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
+    #     mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
 
-        with torch.no_grad():
-            pred = model(mel_batch, img_batch)
+    #     with torch.no_grad():
+    #         pred = model(mel_batch, img_batch)
 
-        pred = pred.cpu().numpy().transpose(0, 2, 3, 1) * 255.
+    #     pred = pred.cpu().numpy().transpose(0, 2, 3, 1) * 255.
         
-        for p, f, c in zip(pred, frames, coords):
-            y1, y2, x1, x2 = c
-            p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
+    #     for p, f, c in zip(pred, frames, coords):
+    #         y1, y2, x1, x2 = c
+    #         p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
 
-            f[y1:y2, x1:x2] = p
-            out.write(f)
+    #         f[y1:y2, x1:x2] = p
+    #         out.write(f)
 
-    out.release()
+    # out.release()
 
-    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio, 'temp/result.avi', args.outfile)
-    subprocess.call(command, shell=platform.system() != 'Windows')
-    print("total time:",str(time.time()-st))
+    # command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio, 'temp/result.avi', args.outfile)
+    # subprocess.call(command, shell=platform.system() != 'Windows')
+    # print("total time:",str(time.time()-st))
 
 if __name__ == '__main__':
     main()
