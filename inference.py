@@ -113,7 +113,8 @@ def face_detect(images):
     t2 = time.time()
     print("total time for face detection!:",str(t2-t1))
 
-    directory_path = 'data/' + args.character + '/' + args.google_drive_id
+    directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.google_drive_id
+    
     #google_drive_id = args.google_drive_id
     #output_name = google_drive_id + ".pkl"
     # Check if the directory exists, if not create it
