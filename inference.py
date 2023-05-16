@@ -141,7 +141,8 @@ def datagen(frames, mels):
     if args.box[0] == -1:
         if (len(args.pkl_path) > 0):
             print("LOADING FACE DETECTION PICKLE!")
-            with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'rb') as f:
+            # with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'rb') as f:
+            with open(args.pkl_path, 'rb') as f:
                 face_det_results = pickle.load(f)
         else:
             if not args.static:
