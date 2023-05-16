@@ -117,17 +117,17 @@ def face_detect(images):
     print("directory path:",directory_path)
     if (len(args.pkl_path) == 0):
         with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
-            print("dumping pkl results #1!")
+            print("SAVING FACE DETECTION RESULTS FOR FASTER LOADING!")
             pickle.dump(results, f)
     #google_drive_id = args.google_drive_id
     #output_name = google_drive_id + ".pkl"
     # Check if the directory exists, if not create it
-    if not os.path.exists(directory_path) and len(args.pkl_path) == 0:
-        print("should be making dir path here")
-        os.makedirs(directory_path)
-        with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
-            print("dumping pkl results #2!")
-            pickle.dump(results, f)
+    # if not os.path.exists(directory_path) and len(args.pkl_path) == 0:
+    #     print("should be making dir path here")
+    #     os.makedirs(directory_path)
+    #     with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
+    #         print("dumping pkl results #2!")
+    #         pickle.dump(results, f)
     del detector
     return results 
 
