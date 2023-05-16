@@ -11,6 +11,10 @@ import pickle
 import time
 
 parser = argparse.ArgumentParser(description='Inference code to lip-sync videos in the wild using Wav2Lip models')
+parser.add_argument('--pkl_path', type=str,
+                    help='path to pkl file (if empty then must run face detection on this mp4)')
+parser.add_argument('--google_drive_id', type=str,
+                    help='google drive mp4 id')
 parser.add_argument('--character', type=str,
                     help='character to do lip sync on')
 parser.add_argument('--checkpoint_path', type=str, 
@@ -109,12 +113,14 @@ def face_detect(images):
     t2 = time.time()
     print("total time for face detection!:",str(t2-t1))
 
-    directory_path = 'data/' + args.character + '/'
+    directory_path = 'data/' + args.character + '/' + args.google_drive_id
+    #google_drive_id = args.google_drive_id
+    #output_name = google_drive_id + ".pkl"
     # Check if the directory exists, if not create it
-    if not os.path.exists(directory_path):
+    if not os.path.exists(directory_path) and len(args.pkl_path) == 0:
         os.makedirs(directory_path)
-    with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
-        pickle.dump(results, f)
+        with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
+            pickle.dump(results, f)
     del detector
     return results 
 
@@ -126,7 +132,8 @@ def datagen(frames, mels):
     directory_path = 'data/' + args.character + '/'
     face_detection_dir = os.path.join(directory_path, 'face_detection_results.pkl')
     if args.box[0] == -1:
-        if os.path.exists(face_detection_dir):
+        if (len(args.pkl_path) > 0):
+            print("LOADING FACE DETECTION PICKLE!")
             with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'rb') as f:
                 face_det_results = pickle.load(f)
         else:
@@ -267,18 +274,19 @@ def main():
 
     print("Length of mel chunks: {}".format(len(mel_chunks)))
     full_frames = full_frames[:len(mel_chunks)]
-
     batch_size = args.wav2lip_batch_size    
     print("type of full frames:",type(full_frames))
     print("type of mel_chunks:",type(mel_chunks))
     print("before datagen time:",str(time.time()-st))
     gen = datagen(full_frames.copy(), mel_chunks)
-
+    print("after datagen time:",str(time.time()-st))
     for i, (img_batch, mel_batch, frames, coords) in enumerate(tqdm(gen, 
                                             total=int(np.ceil(float(len(mel_chunks))/batch_size)))):
         if i == 0:
             model = load_model(args.checkpoint_path)
-            print ("Model loaded")
+            #print ("Model loaded")
+            print("model loaded time:",str(time.time()-st))
+
 
             frame_h, frame_w = full_frames[0].shape[:-1]
             out = cv2.VideoWriter('temp/result.avi', 
