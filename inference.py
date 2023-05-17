@@ -13,7 +13,7 @@ import time
 parser = argparse.ArgumentParser(description='Inference code to lip-sync videos in the wild using Wav2Lip models')
 parser.add_argument('--pkl_path', type=str,
                     help='path to pkl file (if empty then must run face detection on this mp4)')
-parser.add_argument('--google_drive_id', type=str,
+parser.add_argument('--original_clip_name', type=str,
                     help='google drive mp4 id')
 parser.add_argument('--character', type=str,
                     help='character to do lip sync on')
@@ -113,7 +113,8 @@ def face_detect(images):
     t2 = time.time()
     print("total time for face detection!:",str(t2-t1))
 
-    directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.google_drive_id
+    #directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.google_drive_id
+    directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.original_clip_name
     print("directory path:",directory_path)
     if (len(args.pkl_path) == 0):
         with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
