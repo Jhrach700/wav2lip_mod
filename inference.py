@@ -114,10 +114,13 @@ def face_detect(images):
     print("total time for face detection!:",str(t2-t1))
 
     #directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.google_drive_id
-    directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.original_clip_name
+    directory_path = '/content/wav2lip_mod/data/' + args.character
     print("directory path:",directory_path)
+
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
     if (len(args.pkl_path) == 0):
-        with open(os.path.join(directory_path, 'face_detection_results.pkl'), 'wb') as f:
+        with open(os.path.join(directory_path, args.original_clip_name + '.pkl'), 'wb') as f:
             print("SAVING FACE DETECTION RESULTS FOR FASTER LOADING!")
             pickle.dump(results, f)
     #google_drive_id = args.google_drive_id
