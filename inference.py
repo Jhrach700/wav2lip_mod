@@ -11,7 +11,7 @@ import pickle
 import time
 
 parser = argparse.ArgumentParser(description='Inference code to lip-sync videos in the wild using Wav2Lip models')
-parser.add_argument('--pkl_path', type=str,
+parser.add_argument('--pkl_path', type=str, required=False,
                     help='path to pkl file (if empty then must run face detection on this mp4)')
 parser.add_argument('--original_clip_name', type=str,
                     help='name of original clip in gdrive folder')
