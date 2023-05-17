@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='Inference code to lip-sync videos 
 parser.add_argument('--pkl_path', type=str,
                     help='path to pkl file (if empty then must run face detection on this mp4)')
 parser.add_argument('--original_clip_name', type=str,
-                    help='google drive mp4 id')
+                    help='name of original clip in gdrive folder')
 parser.add_argument('--character', type=str,
                     help='character to do lip sync on')
 parser.add_argument('--checkpoint_path', type=str, 
