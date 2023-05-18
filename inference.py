@@ -163,7 +163,7 @@ def datagen(frames, mels):
     for i, m in enumerate(mels):
         idx = 0 if args.static else i % len(frames)
         frame_to_save = frames[idx].copy()
-        print(f'idx: {idx}, len(face_det_results): {len(face_det_results)}')
+        #print(f'idx: {idx}, len(face_det_results): {len(face_det_results)}')
         face, coords = face_det_results[idx].copy()
 
         face = cv2.resize(face, (args.img_size, args.img_size))
