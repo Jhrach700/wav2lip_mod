@@ -116,7 +116,7 @@ def face_detect(images):
     #directory_path = '/content/wav2lip_mod/data/' + args.character + '/' + args.google_drive_id
     directory_path = '/content/wav2lip_mod/data/' + args.character
     print("directory path:",directory_path)
-
+    
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
     if (len(args.pkl_path) == 0):
@@ -161,8 +161,9 @@ def datagen(frames, mels):
         face_det_results = [[f[y1: y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
 
     for i, m in enumerate(mels):
-        idx = 0 if args.static else i%len(frames)
+        idx = 0 if args.static else i % len(frames)
         frame_to_save = frames[idx].copy()
+        print(f'idx: {idx}, len(face_det_results): {len(face_det_results)}')
         face, coords = face_det_results[idx].copy()
 
         face = cv2.resize(face, (args.img_size, args.img_size))
