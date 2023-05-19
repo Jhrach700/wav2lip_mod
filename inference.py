@@ -9,8 +9,11 @@ from models import Wav2Lip
 import platform
 import pickle
 import time
+import sys
 
 parser = argparse.ArgumentParser(description='Inference code to lip-sync videos in the wild using Wav2Lip models')
+parser.add_argument('--mode', type=str, required=False, default= "full",
+                    help='set to face_detection if only want to save pkl face detection for faster wav2lip')
 parser.add_argument('--pkl_path', type=str, required=False,
                     help='path to pkl file (if empty then must run face detection on this mp4)')
 parser.add_argument('--original_clip_name', type=str,
@@ -123,6 +126,10 @@ def face_detect(images):
         with open(os.path.join(directory_path, args.original_clip_name + '.pkl'), 'wb') as f:
             print("SAVING FACE DETECTION RESULTS FOR FASTER LOADING!")
             pickle.dump(results, f)
+        if (args.mode == 'face_detection'):
+            print("In face detection mode only! PKL file saved, stopping entire script")
+            sys.exit()
+
     #google_drive_id = args.google_drive_id
     #output_name = google_drive_id + ".pkl"
     # Check if the directory exists, if not create it
